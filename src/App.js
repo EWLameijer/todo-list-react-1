@@ -1,25 +1,33 @@
-import logo from './logo.svg';
 import './App.css';
+import Header from './Header';
+import ListInput from './ListInput';
+import ToDoList from './ToDoList';
+import React, { useState } from "react";
 
-function App() {
+const App = () => {
+  const [toDoList, setToDoList] = useState([]);
+
+  const equalIgnoringCase = (firstString, secondString) => firstString.localeCompare(secondString, undefined, { sensitivity: 'accent' }) === 0;
+
+  const addItem = text => toDoList.some(item => equalIgnoringCase(item.description, text)) ? alert(`'${text}' is already in the list!`) :
+    setToDoList([...toDoList, { description: text, done: false }]);
+
+  const removeItem = text =>
+    setToDoList(toDoList.filter(n => n.description !== text));
+
+  const toggleDone = text => {
+    const index = toDoList.findIndex(item => item.description === text)
+    const originalItem = toDoList[index];
+    const toggledItem = { ...originalItem, done: !originalItem.done };
+    setToDoList(Object.values({ ...toDoList, [index]: toggledItem }));
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+      <Header />
+      <ListInput returnItem={addItem} />
+      <ToDoList items={toDoList} removeItem={removeItem} toggleDone={toggleDone} />
+    </div>)
 }
 
 export default App;
